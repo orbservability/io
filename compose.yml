@@ -1,0 +1,14 @@
+services:
+  go: &go
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+    entrypoint: go
+    command: help
+    volumes:
+      - .:/usr/src/app:delegated
+      - gomod:/go/pkg/mod
+
+volumes:
+  gomod: {}
