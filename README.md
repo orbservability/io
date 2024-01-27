@@ -6,7 +6,7 @@ Common setup for incoming and outgoing requests. E.g. Client and server setup.
 
 ```go
 require (
-  "github.com/orbservability/io v0.0.1"
+  github.com/orbservability/io v0.0.1
 )
 ```
 
