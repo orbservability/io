@@ -25,13 +25,12 @@ func NewSerde(messages []proto.Message) (*sr.Serde, error) {
 
 	var serde sr.Serde
 	for _, message := range messages {
-		subject := fmt.Sprintf("/subjects/%s/versions/latest", proto.MessageName(message))
-		schema, err := rcl.LookupSchema(ctx, subject, sr.Schema{})
+		schema, err := rcl.SchemaByVersion(ctx, string(proto.MessageName(message)), -1)
 		if err != nil {
 			return nil, err
 		}
 
-		// Register the message type with the serde
+		// Register the message types with the serde
 		serde.Register(
 			schema.ID,
 			message,
