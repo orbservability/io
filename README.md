@@ -113,6 +113,7 @@ import (
 
   "github.com/orbservability/io/pkg/kafka"
   "github.com/orbservability/io/pkg/schema"
+  "github.com/orbservability/io/pkg/client"
   "github.com/rs/zerolog/log"
   "github.com/twmb/franz-go/pkg/kgo"
 
@@ -128,6 +129,19 @@ func main() {
     log.Fatal().Err(err).Msg("Error initializing Kafka client")
   }
   defer kafkaClient.Close()
+
+  // Initialize gRPC client
+  thing := &thing.ServiceClient{}
+  grpcConn, err := client.DialGRPC("api.orbservability.com", thing, grpc.WithTransportCredentials(insecure.NewCredentials()))
+  if err != nil {
+    log.Fatal().Err(err).Msg("Error creating gRPC connection")
+  }
+  defer grpcConn.Close()
+  grpcStream, err := thing.DoThings(ctx)
+  if err != nil {
+    log.Fatal().Err(err).Msg("Error creating gRPC stream")
+  }
+  defer grpcStream.CloseAndRecv()
 
   // Work with data from the Schema Registry
   messages := []proto.Message{
