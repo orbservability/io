@@ -18,11 +18,13 @@ type ServiceRegistrar interface {
 	RegisterWithServer(*grpc.Server)
 }
 
-func ServeGRPC(errChan chan<- error, services []ServiceRegistrar) *grpc.Server {
-	grpcServer := grpc.NewServer(
+func ServeGRPC(errChan chan<- error, services []ServiceRegistrar, opts ...grpc.ServerOption) *grpc.Server {
+	defaultOpts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(logs.UnaryServerInterceptor, metrics.UnaryServerInterceptor, traces.UnaryServerInterceptor),
 		grpc.ChainStreamInterceptor(logs.StreamServerInterceptor, metrics.StreamServerInterceptor, traces.StreamServerInterceptor),
-	)
+	}
+
+	grpcServer := grpc.NewServer(append(defaultOpts, opts...)...)
 
 	// Register each service with the gRPC server
 	for _, service := range services {
